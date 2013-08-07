@@ -33,6 +33,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
             </when>
             <otherwise>
                 <logger message="Invalid method!" level="INFO" doc:name="Invalid method"/>
+                <http:response-builder status="405" doc:name="HTTP Response Builder"/>
             </otherwise>
         </choice>
     </flow>
