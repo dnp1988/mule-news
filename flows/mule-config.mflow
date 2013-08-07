@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mule-configuration xmlns="http://www.mulesoft.com/tooling/messageflow" name="mule-config">
+    <global-element name="MySQL Data Source" type="http://www.mulesoft.org/schema/mule/ee/jdbc/mysql-data-source" entity-id="MySQL Data Source#1">
+        <properties>
+            <property name="port"/>
+            <property name="host"/>
+            <property name="name" value="mule-news-db"/>
+            <property name="loginTimeout"/>
+            <property name="transactionIsolation" value="UNSPECIFIED"/>
+            <property name="password" value="PMmulebells"/>
+            <property name="user" value="peoplematter"/>
+            <property name="database"/>
+            <property name="url" value="jdbc:mysql://peoplematter.cbbmvnwhlhi8.us-east-1.rds.amazonaws.com:3306/mulenews?rewriteBatchedStatements=true"/>
+            <property name="auxiliary;index" value="1"/>
+        </properties>
+    </global-element>
+    <global-element name="Database" type="http://www.mulesoft.org/schema/mule/ee/jdbc/connector" entity-id="Database#1">
+        <properties>
+            <property name="dispatcherPoolFactory-ref"/>
+            <property name="transactionPerMessage"/>
+            <property name="resultSetHandler-ref"/>
+            <property name="dataSource-ref to Bean" value="mule-news-db"/>
+            <property name="pollingFrequency" value="0"/>
+            <property name="queryTimeout" value="-1"/>
+            <property name="name" value="Database"/>
+            <property name="validateConnections" value="true"/>
+            <property name="dynamicNotification"/>
+            <property name="queryRunner-ref"/>
+            <property name="auxiliary;index" value="2"/>
+            <property name="dataSource-ref to JDBC DataSource" value="mule-news-db"/>
+        </properties>
+    </global-element>
+    <description></description>
+</mule-configuration>

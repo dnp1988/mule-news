@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jdbc-ee="http://www.mulesoft.org/schema/mule/ee/jdbc"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.4.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/ee/jdbc/current/mule-jdbc-ee.xsd http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+	<jdbc-ee:mysql-data-source name="mule-news-db"
+		user="peoplematter" password="PMmulebells"
+		url="jdbc:mysql://peoplematter.cbbmvnwhlhi8.us-east-1.rds.amazonaws.com:3306/mulenews?rewriteBatchedStatements=true"
+		transactionIsolation="UNSPECIFIED" doc:name="MySQL Data Source" />
+	<jdbc-ee:connector name="Database" dataSource-ref="mule-news-db"
+		validateConnections="true" queryTimeout="-1" pollingFrequency="0"
+		doc:name="Database" />
+</mule>
