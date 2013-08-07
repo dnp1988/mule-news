@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jdbc-ee="http://www.mulesoft.org/schema/mule/ee/jdbc" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" version="EE-3.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+<mule xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:jdbc-ee="http://www.mulesoft.org/schema/mule/ee/jdbc" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" version="EE-3.4.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/ee/jdbc/current/mule-jdbc-ee.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd">
     <flow name="receive-news" doc:name="receive-news">
         <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="HTTP"/>
         <choice doc:name="Choice">
             <when expression="#[message.inboundProperties['http.method'] == 'GET']">
                 <logger message="Got a GET message call" level="INFO" doc:name="GET Message branch"/>
                 <choice doc:name="Choice">
-                    <when expression="">
+                    <when expression="#[message.inboundProperties['lastUpdate'] != null]">
                         <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="selectRecentNews" queryTimeout="-1" connector-ref="Database" doc:name="Select Recent News">
                             <jdbc-ee:query key="selectRecentNews" value="SELECT * FROM news WHERE createdAt &gt; #[message.inboundProperties['lastUpdate']]"/>
                         </jdbc-ee:outbound-endpoint>
@@ -22,12 +23,17 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
                         </jdbc-ee:outbound-endpoint>
                     </otherwise>
                 </choice>
+                <json:object-to-json-transformer doc:name="Results to JSON"/>
             </when>
-            <when expression="">
+            <when expression="#[message.inboundProperties['http.method'] == 'POST']">
                 <logger level="INFO" doc:name="POST Message branch"/>
+                <jdbc-ee:outbound-endpoint exchange-pattern="one-way" queryKey="insertNews" queryTimeout="-1" connector-ref="Database" doc:name="Database">
+                    <jdbc-ee:query key="insertNews" value="INSERT INTO news (title, content, category, createdAt, url) VALUES (#[json:title], #[json:content], #[json:category], #[json:createdAt], #[json:url])"/>
+                </jdbc-ee:outbound-endpoint>
             </when>
             <otherwise>
                 <logger message="Invalid method!" level="INFO" doc:name="Invalid method"/>
+                <http:response-builder status="405" doc:name="HTTP Response Builder"/>
             </otherwise>
         </choice>
     </flow>

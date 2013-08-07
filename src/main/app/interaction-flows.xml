@@ -15,7 +15,9 @@ http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/
                     <add-message-property key="studioId" value="#[json:studioId]"/>
                     <add-message-property key="type" value="#[json:type]"/>
                 </message-properties-transformer>
-                <jdbc-ee:outbound-endpoint exchange-pattern="request-response"  queryTimeout="-1" doc:name="Database" queryKey="createInteraction" connector-ref="Database"/>
+                <jdbc-ee:outbound-endpoint exchange-pattern="request-response"  queryTimeout="-1" doc:name="Database" queryKey="createInteraction" connector-ref="Database">
+                	<jdbc-ee:query key="createInteraction" value="INSERT INTO interactions (newsId,studioId,type) VALUES(#[newsId],#[studioId],#[type])"></jdbc-ee:query>
+                </jdbc-ee:outbound-endpoint>	
                 <logger message="#[payload]" level="INFO" doc:name="Logger"/>
             </when>
             <when expression="#[message.inboundProperties['http.method'] == 'GET']">
