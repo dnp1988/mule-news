@@ -10,6 +10,21 @@ http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/
         <choice doc:name="Choice">
             <when expression="#[message.inboundProperties['http.method'] == 'GET']">
                 <logger message="Got a GET message call" level="INFO" doc:name="GET Message branch"/>
+                <choice doc:name="Choice">
+                    <when expression="">
+                        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="selectRecentNews" queryTimeout="-1" connector-ref="Database" doc:name="Select Recent News">
+                            <jdbc-ee:query key="selectRecentNews" value="SELECT * FROM news WHERE createdAt &gt; #[message.inboundProperties['lastUpdate']]"/>
+                        </jdbc-ee:outbound-endpoint>
+                    </when>
+                    <otherwise>
+                        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="selectAllNews" queryTimeout="-1" connector-ref="Database" doc:name="Select All News">
+                            <jdbc-ee:query key="selectAllNews" value="SELECT * FROM news"/>
+                        </jdbc-ee:outbound-endpoint>
+                    </otherwise>
+                </choice>
+            </when>
+            <when expression="">
+                <logger level="INFO" doc:name="POST Message branch"/>
             </when>
             <otherwise>
                 <logger message="Invalid method!" level="INFO" doc:name="Invalid method"/>
