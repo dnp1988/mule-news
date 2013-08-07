@@ -12,7 +12,7 @@ http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/jso
             <when expression="#[message.inboundProperties['http.method'] == 'GET']">
                 <logger message="Got a GET message call" level="INFO" doc:name="GET Message branch"/>
                 <choice doc:name="Choice">
-                    <when expression="">
+                    <when expression="#[message.inboundProperties['lastUpdate'] != null]">
                         <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="selectRecentNews" queryTimeout="-1" connector-ref="Database" doc:name="Select Recent News">
                             <jdbc-ee:query key="selectRecentNews" value="SELECT * FROM news WHERE createdAt &gt; #[message.inboundProperties['lastUpdate']]"/>
                         </jdbc-ee:outbound-endpoint>
