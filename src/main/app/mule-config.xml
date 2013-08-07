@@ -14,5 +14,5 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 	<jdbc-ee:connector name="Database" dataSource-ref="mule-news-db"
 		validateConnections="true" queryTimeout="-1" pollingFrequency="0"
 		doc:name="Database" />
-    <context:property-placeholder location="mule.dev.properties"/>
+    <context:property-placeholder location="mule.${mule.env}.properties"/>
 </mule>
