@@ -7,10 +7,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
-<!-- 	<flow name="static-resourcesFlow1" doc:name="static-resourcesFlow1"> -->
-<!-- 		<http:inbound-endpoint exchange-pattern="request-response" -->
-<!-- 			host="localhost" port="${http.port}" doc:name="HTTP" path="site" /> -->
-<!-- 		<http:static-resource-handler -->
-<!-- 			resourceBase="${app.home}/docroot" defaultFile="index.html" /> -->
-<!-- 	</flow> -->
+	<flow name="static-resourcesFlow1" doc:name="static-resourcesFlow1">
+		<http:inbound-endpoint exchange-pattern="request-response"
+			host="localhost" port="${http.port}" doc:name="HTTP" path="site" />
+		<http:static-resource-handler
+			resourceBase="${app.home}/docroot" defaultFile="index.html" />
+	</flow>
 </mule>

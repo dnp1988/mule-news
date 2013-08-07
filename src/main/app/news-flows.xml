@@ -8,7 +8,7 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
     <flow name="receive-news" doc:name="receive-news">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="HTTP" path="news"/>
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${webapp.port}" doc:name="HTTP" path="news"/>
         <choice doc:name="Choice">
             <when expression="#[message.inboundProperties['http.method'] == 'GET']">
                 <logger message="Got a GET message call" level="INFO" doc:name="GET Message branch"/>
