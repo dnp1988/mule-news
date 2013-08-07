@@ -14,7 +14,7 @@ public class Interaction extends FunctionalTestCase {
 		MuleClient client = muleContext.getClient();
 		MuleMessage request  = new DefaultMuleMessage("{\"1\":\"lala\"}", muleContext);
 		request.setOutboundProperty("http.method", "POST");
-		MuleMessage response = client.send("http://localhost:8081", request);
+		MuleMessage response = client.send("http://localhost:8081/interaction", request);
 	}
 
 	@Override

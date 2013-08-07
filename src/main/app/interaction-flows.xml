@@ -5,7 +5,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
 http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
     <flow name="interaction.creation" doc:name="interaction.creation">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="HTTP"/>
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="8081" doc:name="HTTP" path="interaction"/>
         <choice doc:name="Choice">
             <when expression="#[message.inboundProperties['http.method'] == 'POST']">
                 <json:json-to-object-transformer doc:name="JSON to Object"/>
@@ -15,6 +15,9 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
                 <json:json-to-object-transformer doc:name="JSON to Object"/>
                 <logger message="Object from JSON #[payload]" level="INFO" doc:name="Logger"/>
             </when>
+            <otherwise>
+                <logger message="Payload is #[payload]" level="INFO" doc:name="Logger"/>
+            </otherwise>
         </choice>
     </flow>
 </mule>
