@@ -12,14 +12,14 @@ public class Interaction extends FunctionalTestCase {
 	@Test
 	public void test() throws MuleException {
 		MuleClient client = muleContext.getClient();
-		MuleMessage request  = new DefaultMuleMessage("{\"1\":\"lala\"}", muleContext);
+		MuleMessage request  = new DefaultMuleMessage("{\"newsId\":\"2\",\"studioId\":\"AnStudioId\",\"type\":\"opened\"}", muleContext);
 		request.setOutboundProperty("http.method", "POST");
 		MuleMessage response = client.send("http://localhost:8081/interaction", request);
 	}
 
 	@Override
 	protected String getConfigResources() {
-		return "src/main/app/interaction-flows.xml,src/main/app/message-flows.xml,src/main/app/mule-config.xml";
+		return "src/main/app/interaction-flows.xml,src/main/app/news-flows.xml,src/main/app/mule-config.xml";
 	}
 
 }
