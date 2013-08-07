@@ -15,17 +15,42 @@ http://www.mulesoft.org/schema/mule/ee/jdbc http://www.mulesoft.org/schema/mule/
                     <add-message-property key="studioId" value="#[json:studioId]"/>
                     <add-message-property key="type" value="#[json:type]"/>
                 </message-properties-transformer>
-                <jdbc-ee:outbound-endpoint exchange-pattern="request-response"  queryTimeout="-1" doc:name="Database" queryKey="createInteraction" connector-ref="Database">
+                <jdbc-ee:outbound-endpoint exchange-pattern="request-response"  queryTimeout="-1" doc:name="createInteraction" queryKey="createInteraction" connector-ref="Database">
                 	<jdbc-ee:query key="createInteraction" value="INSERT INTO interactions (newsId,studioId,type) VALUES(#[newsId],#[studioId],#[type])"></jdbc-ee:query>
                 </jdbc-ee:outbound-endpoint>	
                 <logger message="#[payload]" level="INFO" doc:name="Logger"/>
             </when>
             <when expression="#[message.inboundProperties['http.method'] == 'GET']">
-                <http:body-to-parameter-map-transformer doc:name="Body to Parameter Map"/>
+                <logger message="Message received for get interaction is: #[payload]" level="INFO" doc:name="Logger"/>
+                <message-properties-transformer scope="invocation" doc:name="Message Properties">
+                    <add-message-property key="month" value="#[message.inboundProperties['month']]"/>
+                    <add-message-property key="studioId" value="#[message.inboundProperties['studioId']]"/>
+            	</message-properties-transformer>
+                <choice doc:name="Choice">
+                    <when expression="flowVars['studioId'] != null and flowVars['month'] == null">
+                        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="getInteractionByStudioId" queryTimeout="-1" connector-ref="Database" doc:name="getInteractionByStudioId">
+                            <jdbc-ee:query key="getInteractionByStudioId" value="SELECT * from interactions where studioId = #[studioId]"/>
+                        </jdbc-ee:outbound-endpoint>
+                    </when>
+                    <when expression="flowVars['studioId'] != null and flowVars['month'] != null">
+                        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="getInteractionByStudioIdAndMonth" queryTimeout="-1" connector-ref="Database" doc:name="getInteractionByStudioIdAndMonth">
+                            <jdbc-ee:query key="getInteractionByStudioIdAndMonth" value="SELECT * from interactions where studioId = #[studioId] and month(createdAt) = #[month]"/>
+                        </jdbc-ee:outbound-endpoint>
+                    </when>
+                    <when expression="flowVars['studioId'] == null and flowVars['month'] != null">
+                        <jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="getInteractionByMonth" queryTimeout="-1" connector-ref="Database" doc:name="getInteractionByMonth">
+                            <jdbc-ee:query key="getInteractionByMonth" value="SELECT * from interactions where month(createdAt) = #[month]"/>
+                        </jdbc-ee:outbound-endpoint>
+                    </when>
+                    <otherwise>
+                    	<jdbc-ee:outbound-endpoint exchange-pattern="request-response" queryKey="getAllInteractions" queryTimeout="-1" connector-ref="Database" doc:name="getAllInteractions">
+                            <jdbc-ee:query key="getAllInteractions" value="SELECT * from interactions"/>
+                        </jdbc-ee:outbound-endpoint>
+                    </otherwise>
+                </choice>
                 <logger message="Message received: #[payload]" level="INFO" doc:name="Logger"/>
-                <jdbc-ee:outbound-endpoint exchange-pattern="request-response"  queryTimeout="-1" doc:name="Database" queryKey="getInteraction" connector-ref="Database">
-                	<jdbc-ee:query key="getInteraction" value="SELECT * from interactions"/>
-                </jdbc-ee:outbound-endpoint>
+                <json:object-to-json-transformer doc:name="Object to JSON"/>
+                <logger message="#[payload]" level="INFO" doc:name="Logger"/>
             </when>
             <otherwise>
                 <logger message="Payload is #[payload]" level="INFO" doc:name="Logger"/>
