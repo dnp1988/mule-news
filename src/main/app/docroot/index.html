@@ -1,20 +1,110 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Bootstrap 101 Template</title>
+    <title>Mule News Poster</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
-  </head>
-  <body>
-    <h1>Hello, world!</h1>
-
+    
     <!-- JavaScript plugins (requires jQuery) -->
     <script src="http://code.jquery.com/jquery.js"></script>
+    
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+	
+	<!-- JQuery JSON -->
+    <script src="jquery.json-2.4.min.js"></script>
+    
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
 
-    <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
-    <script src="js/respond.js"></script>
+	<style type="text/css" id="custom-background-css">
+		body { background-color: #E6F8FF; }
+	</style>
+    
+    <script>
+		var data = {
+		        "title":"123",
+		        "content":"",
+		        "category":"",
+		        "createdAt":"",
+		        "url":""
+		};
+		
+		function makeRequest()
+		{
+		    data.title = document.forms["form"]["title"].value;
+		    data.content = document.forms["form"]["content"].value;
+		    data.category = document.forms["form"]["category"].value;
+		    data.createdAt = document.forms["form"]["createdAtDate"].value + " " + document.forms["form"]["createdAtTime"].value;
+		    data.url = document.forms["form"]["url"].value;
+		
+		    var json = $.toJSON(data);
+		    
+// 		    $.post("/news",$("#form").serialize());
+// 		    $.post("/news",data);
+		    $.ajax({
+				type: "POST",
+				url: "/news",
+				data: json,
+		        contentType: "application/json",
+				succes: success,
+				error: function(jqXHR, textStatus, errorThrown) {
+					  console.log(textStatus, errorThrown);
+					}
+		    });
+		}
+
+		function success(data, textStatus, jqXHR) {
+			alert("text status = " + textStatus);
+		}
+
+		$(document).ready( function() {
+		    $('#createdAtDate').val(new Date().toJSON().slice(0, 10));
+		});
+
+		$(document).ready( function() {
+		    $('#createdAtTime').val(new Date().toTimeString().slice(0, 5));
+		});
+
+		$(document).load(function() {
+			if (getURLParameter('title') != null) {
+		    	$('#successDiv').val("<div class=\"alert alert-success\">Your news have been posted!</div>");
+			}
+		});
+		
+		function getURLParameter(name) {
+		    return decodeURI(
+		        (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+		    );
+		}
+	</script>
+  </head>
+  <body>
+    <div class="container">
+      <h2 class="form-post-news-heading">Spread the Mule News!</h2>
+      <div name="successDiv"></div>
+
+	      <form name="form" class="form-group" onsubmit="makeRequest()" >
+	      	<fieldset>
+		        <input type="text" class="form-control" placeholder="Title" name="title" autofocus> <br/>
+		        <textarea class="form-control" rows="10" name="content" placeholder="This is were the content of the news should be!"></textarea> <br/>
+		        <select class="form-control" name="category">
+				  <option value="sales">Sales</option>
+				  <option value="hiring">Hiring</option>
+				  <option value="engineering">Engineering</option>
+				</select> <br/>
+		      	<div class="row">
+		      		<div class="input-group col-lg-6">
+						<input type="date" class="form-control" name="createdAtDate" id="createdAtDate">
+					</div>
+			      	<div class="input-group col-lg-6">
+			    	  	<input type="time" class="form-control" name="createdAtTime" id="createdAtTime">
+					</div>
+		        </div> <br/>
+				<input type="text" class="form-control" placeholder="Blog URL" name="url" value="http://"> <br/>
+		      </fieldset>
+		      <center><button class="btn btn-success btn-lg" type="submit" />Post!</button></center>
+	      </form>
+
+    </div> <!-- /container -->
   </body>
 </html>

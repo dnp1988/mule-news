@@ -8,7 +8,8 @@ http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/m
 http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd">
     <flow name="receive-news" doc:name="receive-news">
-        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${webapp.port}" doc:name="HTTP" path="news"/>
+        <http:inbound-endpoint exchange-pattern="request-response" host="localhost" port="${http.port}" doc:name="HTTP" path="news"/>
+        <logger message="Got a new message. Payload = #[payload]" level="INFO" doc:name="Got a new message"/>
         <choice doc:name="Choice">
             <when expression="#[message.inboundProperties['http.method'] == 'GET']">
                 <logger message="Got a GET message call" level="INFO" doc:name="GET Message branch"/>
@@ -24,7 +25,7 @@ http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mul
                         </jdbc-ee:outbound-endpoint>
                     </otherwise>
                 </choice>
-                <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+                <logger message="Query result = #[payload]" level="INFO" doc:name="Logger"/>
                 <scripting:transformer doc:name="Convert timestamp to string">
                     <scripting:script engine="Groovy"><![CDATA[payload = payload.collect{ it.put('createdAt', it['createdAt'].toString().substring(0, '2013-08-03 12:00:00'.length())); it }
 payload]]></scripting:script>
@@ -32,7 +33,7 @@ payload]]></scripting:script>
                 <json:object-to-json-transformer doc:name="Results to JSON"/>
             </when>
             <when expression="#[message.inboundProperties['http.method'] == 'POST']">
-                <logger level="INFO" doc:name="POST Message branch"/>
+                <logger level="INFO" doc:name="POST Message branch" message="Got a POST message call. Payload = #[payload]"/>
                 <jdbc-ee:outbound-endpoint exchange-pattern="one-way" queryKey="insertNews" queryTimeout="-1" connector-ref="Database" doc:name="Database">
                     <jdbc-ee:query key="insertNews" value="INSERT INTO news (title, content, category, createdAt, url) VALUES (#[json:title], #[json:content], #[json:category], #[json:createdAt], #[json:url])"/>
                 </jdbc-ee:outbound-endpoint>
@@ -43,5 +44,6 @@ payload]]></scripting:script>
                 <http:response-builder status="405" doc:name="HTTP Response Builder"/>
             </otherwise>
         </choice>
+        <logger message="Processing ended" level="INFO" doc:name="End of process"/>
     </flow>
 </mule>

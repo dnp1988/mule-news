@@ -10,6 +10,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<flow name="static-resourcesFlow1" doc:name="static-resourcesFlow1">
 		<http:inbound-endpoint exchange-pattern="request-response"
 			host="localhost" port="${http.port}" doc:name="HTTP" path="site" />
+        <logger message="Entered in static resources" level="INFO" doc:name="Logger"/>
 		<http:static-resource-handler
 			resourceBase="${app.home}/docroot" defaultFile="index.html" />
 	</flow>
